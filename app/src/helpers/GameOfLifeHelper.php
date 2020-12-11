@@ -3,70 +3,59 @@
 namespace Application\src\helpers;
 
 use Application\src\GameOfLife;
+use Application\src\models\Board;
+use Application\src\models\Cell;
 
 class GameOfLifeHelper
 {
-    /**@var $board [][] **/
+    /**@var Board $board **/
     private $board;
-
-    /**@var $colCount int **/
-    private $colCount;
-
-    /**@var $rowCount int **/
-    private $rowCount;
 
     /**
      * GameOfLifeHelper constructor.
-     * @param $board[][]
+     * @param Board $board
      */
-    public function __construct($board = [])
-    {
-        $this->initialize($board);
-    }
-
-    /**
-     * @param $board[][]
-     */
-    private function initialize($board)
+    public function __construct(Board $board)
     {
         $this->board = $board;
-        $this->rowCount = count($board);
-        $this->colCount = count($board[0]);
     }
 
     /**
      * Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction
+     * @param Cell $cell
      * @param int $row
      * @param int $col
      * @return bool
      */
-    public function isCellDeadAndHasMaxPopulation($row, $col)
+    public function isCellDeadAndHasMaxPopulation(Cell $cell, $row, $col)
     {
-        return $this->isCellDead($row, $col)
+        return $cell->isDead()
             && $this->getNumNearCellsAlive($row, $col) == GameOfLife::MAX_POPULATION;
     }
 
     /**
      * Any live cell with fewer than two live neighbours dies, as if caused by under-population
-     * @param $row
-     * @param $col
+     * @param Cell $cell
+     * @param int $row
+     * @param int $col
      * @return bool
      */
-    public function isCellAliveAndHasLessMinPopulation($row, $col)
+    public function isCellAliveAndHasLessMinPopulation(Cell $cell, $row, $col)
     {
-        return $this->isCellAlive($row, $col)
+        return $cell->isAlive()
             && $this->getNumNearCellsAlive($row, $col) < GameOfLife::MIN_POPULATION;
     }
 
     /**
      * Any live cell with more than three live neighbours dies, as if by overcrowding
+     * @param Cell $cell
      * @param int $row
      * @param int $col
      * @return bool
      */
-    public function isCellAliveAndHasMoreMaxPopulation($row, $col)
+    public function isCellAliveAndHasMoreMaxPopulation(Cell $cell, $row, $col)
     {
-        return $this->isCellAlive($row, $col)
+        return $cell->isDead()
             && $this->getNumNearCellsAlive($row, $col) > GameOfLife::MAX_POPULATION;
     }
 
@@ -82,49 +71,24 @@ class GameOfLifeHelper
         $previousRowIndex = $row-1;
         $alive = $this->countCellsAliveInRow($previousRowIndex, $col);
 
-        if (isset($board[$row][$col-1]) && $this->isCellAlive($row, $col-1)) {
-            $alive++;
-        }
+        try {
+            $cellPreviousCol = $board->getCell($row, $col - 1);
+            if ($cellPreviousCol->isAlive()) {
+                $alive++;
+            }
+        } catch (\Exception $e) { }
 
-        if (isset($board[$row][$col+1]) && $this->isCellAlive($row, $col+1)) {
-            $alive++;
-        }
+        try {
+            $cellNextCol = $board->getCell($row, $col + 1);
+            if ($cellNextCol && $cellNextCol->isAlive()) {
+                $alive++;
+            }
+        } catch (\Exception $e) { }
 
         $nextRowIndex = $row+1;
         $alive += $this->countCellsAliveInRow($nextRowIndex, $col);
 
         return $alive;
-    }
-
-    /**
-     * @param int $row
-     * @param int $column
-     * @return bool
-     */
-    public function isCellAlive($row, $column)
-    {
-        return $this->isCell($row, $column, GameOfLife::ALIVE_CELL);
-    }
-
-    /**
-     * @param int $row
-     * @param int $column
-     * @return bool
-     */
-    public function isCellDead($row, $column)
-    {
-        return $this->isCell($row, $column, GameOfLife::DEAD_CELL);
-    }
-
-    /**
-     * @param int $row
-     * @param int $column
-     * @param int $status
-     * @return bool
-     */
-    private function isCell($row, $column, $status)
-    {
-        return (isset($this->board[$row][$column]) && $this->board[$row][$column] == $status);
     }
 
     /**
@@ -136,29 +100,28 @@ class GameOfLifeHelper
     {
         $alive = 0;
         $board = $this->board;
-        if (isset($board[$row])) {
-            if ($this->isCellAlive($row, $col)) {
+        try {
+            $cell = $board->getCell($row, $col);
+            if ($cell->isAlive()) {
                 $alive++;
             }
-            if ($this->isCellAlive($row, $col - 1)) {
+        } catch (\Exception $e) { }
+
+        try {
+            $cellPreviousCol = $board->getCell($row, $col - 1);
+            if ($cellPreviousCol->isAlive()) {
                 $alive++;
             }
-            if ($this->isCellAlive($row, $col + 1)) {
+        } catch (\Exception $e) { }
+
+        try {
+            $cellNextCol = $board->getCell($row, $col + 1);
+            if ($cellNextCol->isAlive()) {
                 $alive++;
             }
-        }
+        } catch (\Exception $e) { }
+
         return $alive;
     }
 
-    /**
-     * @param $board[][]
-     * @param int $g
-     */
-    public function printBoard($board, $g = 0)
-    {
-        echo "\nGeneration #{$g}\n";
-        foreach ($board as $rowIndex => $rows) {
-            echo implode(" ", $rows) . "\n";
-        }
-    }
 }

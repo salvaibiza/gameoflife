@@ -2,7 +2,10 @@
 
 namespace Application\src;
 
+use Application\src\helpers\BoardOutput;
 use Application\src\helpers\GameOfLifeHelper;
+use Application\src\models\Board;
+use Application\src\models\Cell;
 
 class GameOfLife
 {
@@ -11,52 +14,41 @@ class GameOfLife
     const MAX_POPULATION = 3;
     const MIN_POPULATION = 2;
 
-    /**@var $board [][] **/
+    /**@var Board $board  **/
     private $board;
-
-    /**@var $colCount int **/
-    private $colCount;
-
-    /**@var $rowCount int **/
-    private $rowCount;
 
     /**@var $gen int **/
     private $gen = 0;
 
     /**
      * GameOfLife constructor.
-     * @param $board[][]
+     * @param Board $board
      */
-    public function __construct($board)
-    {
-        $this->initialize($board);
-
-        $this->getHelper()->printBoard($board, $this->gen);
-    }
-
-    /**
-     * @param $board[][]
-     */
-    private function initialize($board)
+    public function __construct(Board $board)
     {
         $this->board = $board;
-        $this->rowCount = count($board);
-        $this->colCount = count($board[0]);
+        $this->getOutputHandler()->printBoard($board, $this->gen);
     }
 
-    /**
-     * @return array
-     */
     public function nextGen()
     {
-        $nextGenBoard = [];
-        for ($r = 0; $r < $this->rowCount; $r++) {
-            for ($c = 0; $c < $this->colCount; $c++) {
-                $nextGenBoard[$r][$c] = $this->getNextStatus($r, $c);
+        $board = $this->board;
+        $numRows = $board->getNumRows();
+        $numCols = $board->getNumColumns();
+        $nextGenBoard = new Board($numRows, $numCols);
+
+        for ($r = 0; $r < $numRows; $r++) {
+            for ($c = 0; $c < $numCols; $c++) {
+                if ($cell = $board->getCell($r, $c)) {
+                    $newState = $this->getNextStatus($r, $c);
+                    $newCell = new Cell($newState);
+                    $nextGenBoard->addCell($newCell, $r, $c);
+                }
             }
         }
-        $this->getHelper()->printBoard($nextGenBoard, ++$this->gen);
         $this->board = $nextGenBoard;
+
+        $this->getOutputHandler()->printBoard($nextGenBoard, ++$this->gen);
 
         return $nextGenBoard;
     }
@@ -68,19 +60,34 @@ class GameOfLife
      */
     private function getNextStatus($row, $col)
     {
+        $status = self::DEAD_CELL;
+
         $helper = $this->getHelper();
-        $status = $this->board[$row][$col];
-        if ($helper->isCellAliveAndHasLessMinPopulation($row, $col) ||
-            $helper->isCellAliveAndHasMoreMaxPopulation($row, $col)) {
-            $status = self::DEAD_CELL;
-        } elseif($helper->isCellDeadAndHasMaxPopulation($row, $col)) {
-            $status = self::ALIVE_CELL;
-        }
+        try {
+            $cell = $this->board->getCell($row, $col);
+
+            if ($cell instanceof Cell) {
+                $status = $cell->getState();
+
+                if ($helper->isCellAliveAndHasLessMinPopulation($cell, $row, $col) ||
+                    $helper->isCellAliveAndHasMoreMaxPopulation($cell, $row, $col)) {
+                    $status = self::DEAD_CELL;
+                } elseif ($helper->isCellDeadAndHasMaxPopulation($cell, $row, $col)) {
+                    $status = self::ALIVE_CELL;
+                }
+            }
+        } catch (\Exception $e) { }
+
         return $status;
     }
 
     private function getHelper()
     {
         return new GameOfLifeHelper($this->board);
+    }
+
+    private function getOutputHandler()
+    {
+        return new BoardOutput();
     }
 }

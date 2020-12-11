@@ -4,6 +4,8 @@ require __DIR__ . '/../../../vendor/autoload.php';
 
 use Application\src\GameOfLife;
 use Application\src\helpers\GameOfLifeHelper;
+use Application\src\models\Board;
+use Application\src\models\Cell;
 use PHPUnit\Framework\TestCase;
 
 class GameOfLifeHelperTest extends TestCase
@@ -22,24 +24,28 @@ class GameOfLifeHelperTest extends TestCase
 
     private static function getBoardMock()
     {
-        return [
-            [0, 1, 1, 0],
-            [0, 0, 1, 1],
-            [0, 0, 1, 0],
-            [0, 0, 0, 0]
-        ];
-    }
+        $board = new Board(4, 4);
+        $board->addCell(new Cell(Cell::DEAD_CELL), 0,0);
+        $board->addCell(new Cell(Cell::ALIVE_CELL), 0,1);
+        $board->addCell(new Cell(Cell::ALIVE_CELL), 0,2);
+        $board->addCell(new Cell(Cell::DEAD_CELL), 0,3);
 
-    /**
-     * @param int $r
-     * @param int $c
-     * @param int $expectedStatus
-     * @dataProvider rowAndColumnIndexProviderStatus
-     */
-    public function testIsCellAlive($r, $c, $expectedStatus)
-    {
-        $res = self::$sut->isCellAlive($r, $c);
-        $this->assertEquals($res, $expectedStatus);
+        $board->addCell(new Cell(Cell::DEAD_CELL), 1,0);
+        $board->addCell(new Cell(Cell::DEAD_CELL), 1,1);
+        $board->addCell(new Cell(Cell::ALIVE_CELL), 1,2);
+        $board->addCell(new Cell(Cell::ALIVE_CELL), 1,3);
+
+        $board->addCell(new Cell(Cell::DEAD_CELL), 2,0);
+        $board->addCell(new Cell(Cell::DEAD_CELL), 2,1);
+        $board->addCell(new Cell(Cell::ALIVE_CELL), 2,2);
+        $board->addCell(new Cell(Cell::DEAD_CELL), 2,3);
+
+        $board->addCell(new Cell(Cell::DEAD_CELL), 3,0);
+        $board->addCell(new Cell(Cell::DEAD_CELL), 3,1);
+        $board->addCell(new Cell(Cell::DEAD_CELL), 3,2);
+        $board->addCell(new Cell(Cell::DEAD_CELL), 3,3);
+
+        return $board;
     }
 
     public function rowAndColumnIndexProviderStatus()

@@ -3,6 +3,7 @@
 require __DIR__ . '/../../../vendor/autoload.php';
 
 use Application\src\helpers\BoardGenerator;
+use Application\src\models\Board;
 use PHPUnit\Framework\TestCase;
 
 class BoardGeneratorTest extends TestCase
@@ -12,10 +13,9 @@ class BoardGeneratorTest extends TestCase
     {
         $sut = new BoardGenerator();
         $board = $sut->generateRandomInitialBoard(5, 7);
-        $this->assertIsArray($board);
-        $this->assertIsArray($board[0]);
-        $this->assertCount(5, $board);
-        $this->assertCount(7, $board[0]);
+        $this->assertInstanceOf(Board::class, $board);
+        $this->assertEquals(5, $board->getNumRows());
+        $this->assertEquals(7, $board->getNumColumns());
     }
 
 }
