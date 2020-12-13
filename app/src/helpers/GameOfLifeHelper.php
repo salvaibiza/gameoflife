@@ -55,7 +55,7 @@ class GameOfLifeHelper
      */
     public function isCellAliveAndHasMoreMaxPopulation(Cell $cell, $row, $col)
     {
-        return $cell->isDead()
+        return $cell->isAlive()
             && $this->getNumNearCellsAlive($row, $col) > GameOfLife::MAX_POPULATION;
     }
 
@@ -80,7 +80,7 @@ class GameOfLifeHelper
 
         try {
             $cellNextCol = $board->getCell($row, $col + 1);
-            if ($cellNextCol && $cellNextCol->isAlive()) {
+            if ($cellNextCol->isAlive()) {
                 $alive++;
             }
         } catch (\Exception $e) { }

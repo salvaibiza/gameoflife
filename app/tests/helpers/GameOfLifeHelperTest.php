@@ -12,7 +12,7 @@ class GameOfLifeHelperTest extends TestCase
 {
 
     /**
-     * @var GameOfLife
+     * @var GameOfLifeHelper
      */
     private static $sut;
 
@@ -48,19 +48,6 @@ class GameOfLifeHelperTest extends TestCase
         return $board;
     }
 
-    public function rowAndColumnIndexProviderStatus()
-    {
-        return [
-            [0, 0, GameOfLife::DEAD_CELL],
-            [1, 0, GameOfLife::DEAD_CELL],
-            [2, 2, GameOfLife::ALIVE_CELL],
-            [3, 1, GameOfLife::DEAD_CELL],
-            [99, 1, GameOfLife::DEAD_CELL],
-            [3, 99, GameOfLife::DEAD_CELL],
-            [99, 99, GameOfLife::DEAD_CELL],
-        ];
-    }
-
     /**
      * @param $row
      * @param $col
@@ -80,7 +67,7 @@ class GameOfLifeHelperTest extends TestCase
             [1, 0, 1],
             [2, 2, 2],
             [3, 1, 1],
-            [99, 00, 0],
+            [99, 99, 0],
         ];
     }
 

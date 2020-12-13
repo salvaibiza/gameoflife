@@ -68,28 +68,38 @@ class GameOfLifeTest extends TestCase
         $boardGen1->addCell(new Cell(Cell::DEAD_CELL), 3,2);
         $boardGen1->addCell(new Cell(Cell::DEAD_CELL), 3,3);
 
+        $boardGen2 = new Board(4, 4);
+        $boardGen2->addCell(new Cell(Cell::DEAD_CELL), 0,0);
+        $boardGen2->addCell(new Cell(Cell::DEAD_CELL), 0,1);
+        $boardGen2->addCell(new Cell(Cell::ALIVE_CELL), 0,2);
+        $boardGen2->addCell(new Cell(Cell::ALIVE_CELL), 0,3);
+
+        $boardGen2->addCell(new Cell(Cell::DEAD_CELL), 1,0);
+        $boardGen2->addCell(new Cell(Cell::ALIVE_CELL), 1,1);
+        $boardGen2->addCell(new Cell(Cell::DEAD_CELL), 1,2);
+        $boardGen2->addCell(new Cell(Cell::DEAD_CELL), 1,3);
+
+        $boardGen2->addCell(new Cell(Cell::DEAD_CELL), 2,0);
+        $boardGen2->addCell(new Cell(Cell::DEAD_CELL), 2,1);
+        $boardGen2->addCell(new Cell(Cell::ALIVE_CELL), 2,2);//
+        $boardGen2->addCell(new Cell(Cell::ALIVE_CELL), 2,3);
+
+        $boardGen2->addCell(new Cell(Cell::DEAD_CELL), 3,0);
+        $boardGen2->addCell(new Cell(Cell::DEAD_CELL), 3,1);
+        $boardGen2->addCell(new Cell(Cell::DEAD_CELL), 3,2);
+        $boardGen2->addCell(new Cell(Cell::DEAD_CELL), 3,3);
+
         return [
             [
                 $board,
                 $boardGen1
             ],
-            /**
-             * WIP
-            [
-            [
-            [0, 1, 1, 1],
-            [0, 0, 0, 1],
-            [0, 0, 1, 1],
-            [0, 0, 0, 0]
-            ],
 
             [
-            [0, 0, 1, 1],
-            [0, 1, 0, 0],
-            [0, 0, 1, 1],
-            [0, 0, 0, 0]
-            ]
+                $boardGen1,
+                $boardGen2
             ],
+            /**
             [
             [
             [0, 0, 1, 1],
